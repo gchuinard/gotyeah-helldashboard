@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --amber: #f59e0b;
+  --amber-dim: #92400e;
+  --amber-glow: rgba(245, 158, 11, 0.15);
+  --red: #ef4444;
+  --cyan: #06b6d4;
+  --green: #22c55e;
+  --bg: #070709;
+  --bg2: #0d0d10;
+  --border: rgba(245, 158, 11, 0.25);
+  --border-bright: rgba(245, 158, 11, 0.6);
+  --text: #e8d5a3;
+  --text-dim: #7a6a45;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+}
+
+/* Scanlines */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
