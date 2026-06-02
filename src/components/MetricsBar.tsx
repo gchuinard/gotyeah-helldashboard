@@ -15,6 +15,7 @@ export function MetricsBar({ planets }: Props) {
   const contested = planets.filter(p => p.owner !== 1 && p.players > 0).length
   const terminid = planets.filter(p => p.owner === 2).length
   const automaton = planets.filter(p => p.owner === 3).length
+  const illuminate = planets.filter(p => p.owner === 4).length
 
   const metrics: Metric[] = [
     {
@@ -37,13 +38,18 @@ export function MetricsBar({ planets }: Props) {
       value: automaton,
       color: 'var(--cyan)',
     },
+    {
+      label: 'Sous joug Illuminé',
+      value: illuminate,
+      color: '#a855f7',
+    },
   ]
 
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
+        gridTemplateColumns: 'repeat(5, 1fr)',
         borderBottom: '1px solid var(--border)',
       }}
     >
