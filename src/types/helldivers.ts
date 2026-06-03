@@ -95,8 +95,12 @@ export interface WarInfo {
   planets?: PlanetInfo[]  // fallback
 }
 
-// Planète enrichie (status + position depuis /info)
-export interface PlanetFull extends PlanetStatus {
+// Planète enrichie (status + position depuis /info).
+// useWarData normalise toujours vers la forme imbriquée ({ planet, owner, … }),
+// d'où l'intersection avec PlanetStatusNested. Ce doit être un `type` et non
+// une `interface extends PlanetStatus` : une interface ne peut pas étendre une
+// union (PlanetStatus = Nested | Flat).
+export type PlanetFull = PlanetStatusNested & {
   positionX: number
   positionY: number
   waypoints: number[]

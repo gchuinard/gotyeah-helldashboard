@@ -62,14 +62,12 @@ export function useWarData(refreshInterval = 60_000): WarData {
       }
 
       // Fetch tout en parallèle — v1 en best-effort (catch → tableau vide)
-      const [statusData, infoData, ordersData, v1Planets, rawStatus] = await Promise.all([
+      const [statusData, infoData, ordersData, v1Planets] = await Promise.all([
         fetchJSON<WarStatus>(`${BASE}/status`),
         fetchJSON<WarInfo>(`${BASE}/info`),
         fetchJSON<MajorOrder[]>(`${BASE}/major-orders`),
         fetchJSON<V1Planet[]>('https://api.helldivers2.dev/api/v1/planets', V1_HEADERS)
           .catch(() => [] as V1Planet[]),
-        fetchJSON<WarStatus>('https://api.helldivers2.dev/raw/api/WarSeason/801/Status', V1_HEADERS)
-          .catch(() => null as WarStatus | null),
       ])
 
       // Maps v1 : index → { name, sector }
