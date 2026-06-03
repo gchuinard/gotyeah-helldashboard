@@ -59,6 +59,7 @@ helldivers-dashboard/
 ## API utilisée
 
 **Base URL** : `https://helldiverstrainingmanual.com/api/v1/war`
+**Swagger** : `https://helldivers-2.github.io/api/openapi/swagger-ui.html`
 
 | Endpoint | Contenu |
 |---|---|

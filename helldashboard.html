@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HELLDIVERS II — GALACTIC WAR COMMAND</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --amber: #f59e0b;
+    --amber-dim: #92400e;
+    --amber-glow: rgba(245,158,11,0.15);
+    --red: #ef4444;
+    --red-dim: #7f1d1d;
+    --cyan: #06b6d4;
+    --cyan-dim: #164e63;
+    --green: #22c55e;
+    --green-dim: #14532d;
+    --bg: #070709;
+    --bg2: #0d0d10;
+    --bg3: #111118;
+    --border: rgba(245,158,11,0.25);
+    --border-bright: rgba(245,158,11,0.6);
+    --text: #e8d5a3;
+    --text-dim: #7a6a45;
+    --scanline: rgba(0,0,0,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, var(--scanline) 0px, var(--scanline) 1px, transparent 1px, transparent 4px);
+    pointer-events: none;
+    z-index: 9999;
+    animation: scanroll 8s linear infinite;
+  }
+
+  @keyframes scanroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -100px; }
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--border-bright);
+    position: relative;
+    background: linear-gradient(180deg, rgba(245,158,11,0.06) 0%, transparent 100%);
+  }
+
+  .header-left { display: flex; align-items: center; gap: 16px; }
+
+  .logo-icon {
+    width: 44px; height: 44px;
+    border: 2px solid var(--amber);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 18px; font-weight: 900;
+    color: var(--amber);
+    box-shadow: 0 0 20px rgba(245,158,11,0.4), inset 0 0 10px rgba(245,158,11,0.1);
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-logo {
+    0%, 100% { box-shadow: 0 0 20px rgba(245,158,11,0.4), inset 0 0 10px rgba(245,158,11,0.1); }
+    50% { box-shadow: 0 0 35px rgba(245,158,11,0.7), inset 0 0 18px rgba(245,158,11,0.2); }
+  }
+
+  .title-block {}
+  .title-block .title-main {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px; font-weight: 900;
+    color: var(--amber);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(245,158,11,0.6);
+  }
+  .title-block .title-sub {
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--text-dim); text-transform: uppercase; margin-top: 2px;
+  }
+
+  .header-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    text-align: center;
+  }
+  .war-status {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; letter-spacing: 2px;
+    color: var(--red); text-transform: uppercase;
+  }
+  .war-id { font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .header-right { text-align: right; }
+  .clock { font-family: 'Orbitron', monospace; font-size: 22px; color: var(--amber); letter-spacing: 2px; }
+  .date-str { font-size: 9px; color: var(--text-dim); letter-spacing: 2px; margin-top: 2px; }
+
+  /* TOP BAR METRICS */
+  .top-metrics {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .metric-cell {
+    padding: 14px 20px;
+    border-right: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .metric-cell:last-child { border-right: none; }
+  .metric-cell:hover { background: var(--amber-glow); }
+
+  .metric-label {
+    font-size: 9px; letter-spacing: 2px; color: var(--text-dim);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .metric-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px; font-weight: 700;
+    line-height: 1;
+  }
+  .metric-value.amber { color: var(--amber); text-shadow: 0 0 15px rgba(245,158,11,0.5); }
+  .metric-value.red { color: var(--red); text-shadow: 0 0 15px rgba(239,68,68,0.5); }
+  .metric-value.cyan { color: var(--cyan); text-shadow: 0 0 15px rgba(6,182,212,0.5); }
+  .metric-value.green { color: var(--green); text-shadow: 0 0 15px rgba(34,197,94,0.5); }
+
+  .metric-delta {
+    font-size: 9px; margin-top: 4px; color: var(--text-dim);
+  }
+  .metric-delta.up { color: var(--green); }
+  .metric-delta.down { color: var(--red); }
+
+  .metric-bar {
+    position: absolute; bottom: 0; left: 0;
+    height: 2px; background: var(--amber);
+    transition: width 1s ease;
+    box-shadow: 0 0 6px var(--amber);
+  }
+
+  /* MAIN LAYOUT */
+  .main { display: grid; grid-template-columns: 1fr 360px; min-height: calc(100vh - 150px); }
+
+  /* LEFT - MAP AREA */
+  .map-panel {
+    padding: 20px;
+    border-right: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 3px;
+    color: var(--amber); text-transform: uppercase;
+  }
+  .panel-tag {
+    font-size: 9px; padding: 3px 8px;
+    border: 1px solid var(--border); color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* GALAXY MAP SVG */
+  #galaxy-map {
+    width: 100%; height: 420px;
+    background: radial-gradient(ellipse at 45% 45%, rgba(6,182,212,0.04) 0%, rgba(245,158,11,0.02) 40%, transparent 70%);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #galaxy-map svg {
+    width: 100%; height: 100%;
+  }
+
+  .supply-line {
+    stroke: rgba(245,158,11,0.15);
+    stroke-width: 0.5;
+    stroke-dasharray: 4 6;
+    fill: none;
+    animation: dash-flow 4s linear infinite;
+  }
+  @keyframes dash-flow { to { stroke-dashoffset: -40; } }
+
+  .planet-group { cursor: pointer; }
+  .planet-group:hover .planet-circle { filter: brightness(1.5); }
+
+  .planet-ring {
+    fill: none;
+    stroke-width: 1;
+    animation: rotate-ring 8s linear infinite;
+    transform-origin: center;
+  }
+
+  /* SECTOR LABELS */
+  .sector-label { font-family: 'Share Tech Mono'; font-size: 9px; fill: rgba(245,158,11,0.25); letter-spacing: 2px; }
+
+  /* RIGHT PANEL */
+  .right-panel { display: flex; flex-direction: column; }
+
+  /* PLANET LIST */
+  .planet-list-panel {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .planet-list-panel::-webkit-scrollbar { width: 3px; }
+  .planet-list-panel::-webkit-scrollbar-track { background: var(--bg); }
+  .planet-list-panel::-webkit-scrollbar-thumb { background: var(--amber-dim); }
+
+  .planet-item {
+    display: grid; grid-template-columns: 8px 1fr auto;
+    align-items: center; gap: 10px;
+    padding: 9px 10px;
+    border: 1px solid transparent;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .planet-item:hover { border-color: var(--border); background: var(--amber-glow); }
+  .planet-item.active { border-color: var(--border-bright); background: rgba(245,158,11,0.08); }
+
+  .planet-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+  }
+  .dot-termin { color: #f59e0b; background: #f59e0b; }
+  .dot-auto   { color: #ef4444; background: #ef4444; }
+  .dot-human  { color: #06b6d4; background: #06b6d4; }
+  .dot-contested { color: #a855f7; background: #a855f7; }
+
+  .planet-name {
+    font-size: 11px; font-weight: 600; color: var(--text);
+    font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
+  }
+  .planet-meta { font-size: 9px; color: var(--text-dim); margin-top: 1px; }
+
+  .planet-lib-bar {
+    width: 60px;
+  }
+  .lib-pct { font-family: 'Orbitron', monospace; font-size: 10px; text-align: right; margin-bottom: 3px; }
+  .lib-track {
+    height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden;
+  }
+  .lib-fill { height: 100%; border-radius: 2px; transition: width 0.8s; }
+
+  /* BOTTOM BAR */
+  .bottom-bar {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex; gap: 10px; align-items: center;
+  }
+
+  .faction-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 9px; letter-spacing: 1px; padding: 4px 10px;
+    border: 1px solid;
+  }
+  .badge-termin { border-color: rgba(245,158,11,0.4); color: var(--amber); }
+  .badge-auto   { border-color: rgba(239,68,68,0.4); color: var(--red); }
+  .badge-human  { border-color: rgba(6,182,212,0.4); color: var(--cyan); }
+
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .badge-termin .badge-dot { background: var(--amber); box-shadow: 0 0 4px var(--amber); }
+  .badge-auto .badge-dot   { background: var(--red); box-shadow: 0 0 4px var(--red); }
+  .badge-human .badge-dot  { background: var(--cyan); box-shadow: 0 0 4px var(--cyan); }
+
+  /* MAJOR ORDER BOX */
+  .major-order {
+    margin: 0 16px 16px;
+    border: 1px solid rgba(239,68,68,0.5);
+    padding: 12px 14px;
+    background: rgba(239,68,68,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+  .major-order::before {
+    content: 'MAJOR ORDER';
+    position: absolute; top: 8px; right: 10px;
+    font-size: 8px; letter-spacing: 2px; color: var(--red);
+    font-family: 'Orbitron', monospace;
+  }
+  .order-text { font-size: 11px; line-height: 1.6; color: var(--text); font-family: 'Rajdhani', sans-serif; }
+
+  /* DETAIL PANEL (shown on planet click) */
+  .detail-panel {
+    position: absolute; top: 20px; right: 20px;
+    width: 280px;
+    background: rgba(7,7,9,0.96);
+    border: 1px solid var(--border-bright);
+    padding: 16px;
+    display: none;
+    z-index: 100;
+    box-shadow: 0 0 40px rgba(245,158,11,0.15);
+  }
+  .detail-panel.visible { display: block; animation: slideIn 0.2s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+  .detail-close {
+    position: absolute; top: 10px; right: 12px;
+    color: var(--text-dim); cursor: pointer; font-size: 14px;
+  }
+  .detail-close:hover { color: var(--amber); }
+
+  .detail-name {
+    font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700;
+    color: var(--amber); margin-bottom: 12px; padding-right: 20px;
+  }
+  .detail-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 1px solid var(--border);
+    font-size: 10px;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { color: var(--text-dim); letter-spacing: 1px; }
+  .detail-val { color: var(--text); font-weight: 600; font-family: 'Orbitron', monospace; font-size: 11px; }
+  .detail-val.amber { color: var(--amber); }
+  .detail-val.red { color: var(--red); }
+  .detail-val.cyan { color: var(--cyan); }
+  .detail-val.green { color: var(--green); }
+
+  /* MINI CHART */
+  .mini-chart { margin-top: 12px; }
+  .mini-chart-label { font-size: 9px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 6px; }
+  .mini-chart svg { width: 100%; height: 60px; }
+
+  /* STATUS BAR */
+  .status-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 26px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 24px;
+    padding: 0 20px;
+    z-index: 1000;
+  }
+  .status-item { font-size: 9px; color: var(--text-dim); letter-spacing: 1px; }
+  .status-item span { color: var(--amber); }
+
+  .blink { animation: blink 1.2s step-end infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .loading-overlay {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 9999; gap: 20px;
+  }
+  .loading-title {
+    font-family: 'Orbitron', monospace; font-size: 28px; font-weight: 900;
+    color: var(--amber); letter-spacing: 8px;
+    text-shadow: 0 0 30px rgba(245,158,11,0.7);
+  }
+  .loading-sub { font-size: 11px; letter-spacing: 3px; color: var(--text-dim); }
+  .loading-bar-track {
+    width: 300px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden;
+  }
+  .loading-bar-fill {
+    height: 100%; background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+    animation: load-progress 1.8s ease-in-out forwards;
+  }
+  @keyframes load-progress { from { width: 0; } to { width: 100%; } }
+  .loading-log { font-size: 9px; color: var(--text-dim); letter-spacing: 1px; min-height: 14px; }
+
+  /* GRID LINES IN MAP */
+  .map-grid { stroke: rgba(245,158,11,0.04); stroke-width: 0.5; }
+
+  /* SECTOR BOUNDARY */
+  .sector-boundary { stroke: rgba(245,158,11,0.08); stroke-width: 0.5; fill: rgba(245,158,11,0.02); }
+
+  /* TABS */
+  .tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+  }
+  .tab {
+    padding: 10px 14px; font-size: 9px; letter-spacing: 2px;
+    color: var(--text-dim); cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+  .tab:hover { color: var(--text); }
+
+  /* ERROR STATE */
+  .error-box {
+    margin: 16px; padding: 12px; border: 1px solid rgba(239,68,68,0.4);
+    background: rgba(239,68,68,0.05); font-size: 10px; color: var(--red);
+    display: none;
+  }
+  .error-box.visible { display: block; }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-title">HELLDIVERS II</div>
+  <div class="loading-sub">TERMINAL DE COMMANDEMENT — FORCES ARMÉES DE SUPER TERRE</div>
+  <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+  <div class="loading-log" id="loading-log">CONNEXION AUX SERVEURS DE SUPER TERRE...</div>
+</div>
+
+<!-- MAIN UI -->
+<div id="app" style="display:none; padding-bottom: 26px;">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-icon">HD</div>
+      <div class="title-block">
+        <div class="title-main">War Command</div>
+        <div class="title-sub">Situation Galactique — Flux en Direct</div>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="war-status"><span class="blink">●</span> CONFLIT ACTIF — GUERRE GALACTIQUE 801</div>
+      <div class="war-id">FORCES ARMÉES DE SUPER TERRE — CONFIDENTIEL DÉFENSE</div>
+    </div>
+    <div class="header-right">
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="date-str" id="date-str">LOADING...</div>
+    </div>
+  </div>
+
+  <!-- TOP METRICS -->
+  <div class="top-metrics">
+    <div class="metric-cell" id="m-players">
+      <div class="metric-label">Citoyens déployés pour la Démocratie</div>
+      <div class="metric-value amber" id="v-players">---</div>
+      <div class="metric-delta" id="d-players">EN MISSION ACTUELLEMENT</div>
+      <div class="metric-bar" style="width:0%" id="b-players"></div>
+    </div>
+    <div class="metric-cell" id="m-campaigns">
+      <div class="metric-label">Planètes en manque de Démocratie</div>
+      <div class="metric-value red" id="v-campaigns">--</div>
+      <div class="metric-delta" id="d-campaigns">THÉÂTRES D'OPÉRATIONS ACTIFS</div>
+      <div class="metric-bar" style="width:0%; background: var(--red);" id="b-campaigns"></div>
+    </div>
+    <div class="metric-cell" id="m-termin">
+      <div class="metric-label">Planètes sous infestation Terminiide</div>
+      <div class="metric-value amber" id="v-termin">--</div>
+      <div class="metric-delta">SECTEURS CONTAMINÉS PAR LES NUISIBLES</div>
+      <div class="metric-bar" style="width:0%;" id="b-termin"></div>
+    </div>
+    <div class="metric-cell" id="m-auto">
+      <div class="metric-label">Planètes sous occupation Automate</div>
+      <div class="metric-value red" id="v-auto">--</div>
+      <div class="metric-delta">FRONT MÉCANIQUE — RÉSISTANCE ACCRUE</div>
+      <div class="metric-bar" style="width:0%; background: var(--red);" id="b-auto"></div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- MAP PANEL -->
+    <div class="map-panel">
+      <div class="panel-header">
+        <div class="panel-title">Carte Galactique — Situation Territoriale en Temps Réel</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div class="panel-tag">ZOOM: 1.0x</div>
+          <div class="panel-tag" id="map-status">SYNCHRONISATION...</div>
+        </div>
+      </div>
+
+      <div id="galaxy-map">
+        <svg id="map-svg" viewBox="0 0 800 420" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <radialGradient id="bg-glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(6,182,212,0.06)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+            <filter id="glow-filter">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Background -->
+          <rect width="800" height="420" fill="url(#bg-glow)"/>
+
+          <!-- Grid -->
+          <g class="map-grid">
+            <line x1="0" y1="105" x2="800" y2="105"/>
+            <line x1="0" y1="210" x2="800" y2="210"/>
+            <line x1="0" y1="315" x2="800" y2="315"/>
+            <line x1="200" y1="0" x2="200" y2="420"/>
+            <line x1="400" y1="0" x2="400" y2="420"/>
+            <line x1="600" y1="0" x2="600" y2="420"/>
+          </g>
+
+          <!-- Super Earth (center) -->
+          <g id="super-earth" style="cursor:pointer" onclick="showPlanetDetail({name:'Super Earth', owner:'Human', players:0, liberation:100, sector:'Sol', biome:'Continental', env:'Aucun', health:1000000})">
+            <circle cx="400" cy="210" r="18" fill="rgba(6,182,212,0.15)" stroke="rgba(6,182,212,0.8)" stroke-width="1.5"/>
+            <circle cx="400" cy="210" r="12" fill="rgba(6,182,212,0.3)"/>
+            <circle cx="400" cy="210" r="6" fill="#06b6d4"/>
+            <circle cx="400" cy="210" r="24" fill="none" stroke="rgba(6,182,212,0.3)" stroke-width="0.5" stroke-dasharray="3 5"/>
+            <circle cx="400" cy="210" r="32" fill="none" stroke="rgba(6,182,212,0.15)" stroke-width="0.5" stroke-dasharray="2 8" class="planet-ring"/>
+            <text x="400" y="245" text-anchor="middle" fill="rgba(6,182,212,0.9)" font-family="Share Tech Mono" font-size="9" letter-spacing="1">SUPER EARTH</text>
+          </g>
+
+          <!-- Planets layer (dynamically populated) -->
+          <g id="planets-layer"></g>
+          <g id="lines-layer"></g>
+
+          <!-- Sector labels -->
+          <text class="sector-label" x="50" y="50">SECTOR ALTUS</text>
+          <text class="sector-label" x="550" y="50">SECTOR BARNARD</text>
+          <text class="sector-label" x="50" y="380">SECTOR CANTOLUS</text>
+          <text class="sector-label" x="530" y="380">SECTOR GOTHMAR</text>
+          <text class="sector-label" x="340" y="20">SECTOR SOL</text>
+        </svg>
+      </div>
+
+      <!-- LEGEND -->
+      <div style="display:flex; gap:20px; margin-top:12px; padding: 8px 0; border-top: 1px solid var(--border);">
+        <div style="display:flex; align-items:center; gap:6px; font-size:9px; color:var(--text-dim);">
+          <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 4px #f59e0b;"></div> Infestation Terminiide
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:9px; color:var(--text-dim);">
+          <div style="width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 4px #ef4444;"></div> Occupation Automate
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:9px; color:var(--text-dim);">
+          <div style="width:8px;height:8px;border-radius:50%;background:#06b6d4;box-shadow:0 0 4px #06b6d4;"></div> Sous contrôle de Super Terre
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:9px; color:var(--text-dim);">
+          <div style="width:8px;height:8px;border-radius:50%;background:#a855f7;box-shadow:0 0 4px #a855f7;"></div> Zone disputée
+        </div>
+        <div style="margin-left:auto; font-size:9px; color:var(--text-dim);" id="planet-count">PLANÈTES RECENSÉES: --</div>
+      </div>
+
+      <!-- PLANET DETAIL POPUP -->
+      <div class="detail-panel" id="detail-panel">
+        <div class="detail-close" onclick="document.getElementById('detail-panel').classList.remove('visible')">✕</div>
+        <div class="detail-name" id="dp-name">---</div>
+        <div class="detail-row"><span class="detail-key">OCCUPANT</span><span class="detail-val" id="dp-faction">--</span></div>
+        <div class="detail-row"><span class="detail-key">SECTEUR GALACTIQUE</span><span class="detail-val amber" id="dp-sector">--</span></div>
+        <div class="detail-row"><span class="detail-key">HELLDIVERS AU SOL</span><span class="detail-val cyan" id="dp-players">--</span></div>
+        <div class="detail-row"><span class="detail-key">TAUX DE DÉMOCRATIE</span><span class="detail-val green" id="dp-lib">--</span></div>
+        <div class="detail-row"><span class="detail-key">BIOME PLANÉTAIRE</span><span class="detail-val" id="dp-biome">--</span></div>
+        <div class="detail-row"><span class="detail-key">DANGERS ENVIRONNEMENTAUX</span><span class="detail-val red" id="dp-env">--</span></div>
+        <div class="mini-chart">
+          <div class="mini-chart-label">PROGRESSION DE LA LIBÉRATION (24H)</div>
+          <svg id="mini-chart-svg" viewBox="0 0 240 60">
+            <polyline id="mini-chart-line" points="" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+            <polyline id="mini-chart-area" points="" fill="rgba(34,197,94,0.08)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <!-- MAJOR ORDER -->
+      <div style="padding: 14px 16px 0;">
+        <div style="font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--red);margin-bottom:8px;">⚠ DIRECTIVE DE SUPER TERRE — PRIORITÉ ABSOLUE</div>
+        <div class="major-order">
+          <div class="order-text" id="major-order-text">Connexion aux serveurs de commandement de Super Terre en cours... Restez prêts, Helldivers.</div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('planets')">Fronts actifs</div>
+        <div class="tab" onclick="switchTab('sectors')">Secteurs galactiques</div>
+      </div>
+
+      <!-- PLANET LIST -->
+      <div class="planet-list-panel" id="planet-list">
+        <div style="text-align:center; padding:40px; color:var(--text-dim); font-size:10px; letter-spacing:2px;">
+          ÉTABLISSEMENT DU CONTACT AVEC LE COMMANDEMENT...
+        </div>
+      </div>
+
+      <!-- FACTION SUMMARY -->
+      <div class="bottom-bar">
+        <div class="faction-badge badge-human">
+          <div class="badge-dot"></div>
+          <span id="count-human">0</span> LIBÉRÉES
+        </div>
+        <div class="faction-badge badge-termin">
+          <div class="badge-dot"></div>
+          <span id="count-termin">0</span> INFESTÉES
+        </div>
+        <div class="faction-badge badge-auto">
+          <div class="badge-dot"></div>
+          <span id="count-auto">0</span> OCCUPÉES
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR BOX -->
+  <div class="error-box" id="error-box">
+    ⚠ SIGNAL INTERFÉRÉ — Les transmissions depuis Super Terre sont dégradées. Données partielles affichées. Source: helldiverstrainingmanual.com
+  </div>
+
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-item">RÉSEAU SUPER TERRE: <span>CONNECTÉ</span></div>
+  <div class="status-item">SOURCE: <span>API COMMUNAUTAIRE</span></div>
+  <div class="status-item">PROCHAIN RAPPORT: <span id="next-refresh">--s</span></div>
+  <div class="status-item" style="margin-left:auto;">GUERRE GALACTIQUE N°: <span>801</span></div>
+</div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const STATE = {
+  planets: [],
+  campaigns: [],
+  warInfo: null,
+  majorOrder: null,
+  activeTab: 'planets',
+  selectedPlanet: null,
+  refreshCountdown: 60
+};
+
+const OWNER_NAMES = { 1: 'Super Terre', 2: 'Terminiides', 3: 'Automates', 4: 'Illuminés' };
+const OWNER_LABELS = { 1: 'Libérée — Sous contrôle démocratique', 2: 'Infestée — Nuisibles Terminiides', 3: 'Occupée — Forces Automates', 4: 'Territoire Illuminé' };
+const OWNER_COLORS = { 1: '#06b6d4', 2: '#f59e0b', 3: '#ef4444', 4: '#a855f7' };
+const OWNER_DOT_CLASS = { 1: 'dot-human', 2: 'dot-termin', 3: 'dot-auto', 4: 'dot-contested' };
+
+/* ============================================================
+   CLOCK
+   ============================================================ */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    String(now.getHours()).padStart(2,'0') + ':' +
+    String(now.getMinutes()).padStart(2,'0') + ':' +
+    String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('date-str').textContent =
+    now.toLocaleDateString('fr-FR', {weekday:'short', day:'2-digit', month:'short', year:'numeric'}).toUpperCase();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ============================================================
+   LOADING SEQUENCE
+   ============================================================ */
+const LOADING_MSGS = [
+  'CONNEXION AUX SERVEURS DE SUPER TERRE...',
+  'VÉRIFICATION DES ACCRÉDITATIONS HELLDIVER...',
+  'RÉCEPTION DES RAPPORTS DE GUERRE GALACTIQUE...',
+  'ANALYSE DE LA SITUATION PLANÉTAIRE EN COURS...',
+  'DÉCRYPTAGE DES DIRECTIVES DE COMMANDEMENT...',
+  'CALIBRAGE DE LA CARTE TACTIQUE GALACTIQUE...',
+  'DÉMOCRATIE OPÉRATIONNELLE. POUR LA LIBERTÉ.'
+];
+
+async function runLoadingSequence() {
+  const logEl = document.getElementById('loading-log');
+  for (let i = 0; i < LOADING_MSGS.length; i++) {
+    logEl.textContent = LOADING_MSGS[i];
+    await sleep(i < LOADING_MSGS.length - 1 ? 250 : 400);
+  }
+  await sleep(300);
+  document.getElementById('loading').style.transition = 'opacity 0.4s';
+  document.getElementById('loading').style.opacity = '0';
+  await sleep(400);
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ============================================================
+   API FETCH
+   ============================================================ */
+const PROXY = 'https://helldiverstrainingmanual.com/api/v1/war';
+const CORS = 'https://corsproxy.io/?';
+
+async function fetchJSON(url) {
+  const res = await fetch(CORS + encodeURIComponent(url));
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+async function loadData() {
+  try {
+    const [status, info, orders] = await Promise.allSettled([
+      fetchJSON(`${PROXY}/status`),
+      fetchJSON(`${PROXY}/info`),
+      fetchJSON(`${PROXY}/major-orders`)
+    ]);
+
+    if (status.status === 'fulfilled') {
+      processStatus(status.value);
+    }
+    if (info.status === 'fulfilled') {
+      STATE.warInfo = info.value;
+    }
+    if (orders.status === 'fulfilled' && orders.value) {
+      processMajorOrder(orders.value);
+    }
+
+    renderAll();
+    document.getElementById('map-status').textContent = 'DONNÉES REÇUES';
+  } catch(e) {
+    console.error('API error:', e);
+    document.getElementById('error-box').classList.add('visible');
+    document.getElementById('map-status').textContent = 'SIGNAL DÉGRADÉ';
+    renderFallback();
+  }
+}
+
+function processStatus(data) {
+  if (!data) return;
+
+  // Campaigns (active combat)
+  STATE.campaigns = data.campaigns || [];
+
+  // Planet status
+  STATE.planets = (data.planetStatus || []).map(p => ({
+    index: p.planet?.index ?? p.planetIndex ?? 0,
+    name: p.planet?.name || `Planète ${p.planet?.index || '?'}`,
+    owner: p.owner ?? 1,
+    players: p.players || 0,
+    health: p.health || 0,
+    maxHealth: p.planet?.maxHealth || p.maxHealth || 1000000,
+    sector: p.planet?.sector ?? 0,
+    biome: p.planet?.biome?.slug || 'inconnu',
+    environmentals: p.planet?.environmentals?.map(e => e.name).join(', ') || 'Aucun',
+    liberation: p.liberation ? Math.round(p.liberation * 100) / 100 : Math.round(((1 - p.health / (p.planet?.maxHealth || 1000000)) * 100) * 100) / 100,
+    inCampaign: STATE.campaigns.some(c => c.planet?.index === (p.planet?.index ?? p.planetIndex))
+  }));
+}
+
+function processMajorOrder(orders) {
+  const order = Array.isArray(orders) ? orders[0] : orders;
+  if (!order) return;
+  const briefing = order.setting?.overrideBrief || order.setting?.taskDescription || 'Aucun ordre majeur actif.';
+  document.getElementById('major-order-text').textContent = briefing.substring(0, 200) + (briefing.length > 200 ? '...' : '');
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderAll() {
+  renderMetrics();
+  renderMap();
+  renderPlanetList();
+  renderFactionCounts();
+}
+
+function renderMetrics() {
+  const activePlanets = STATE.planets.filter(p => p.inCampaign);
+  const totalPlayers = STATE.planets.reduce((s, p) => s + p.players, 0);
+  const terminPlanets = STATE.planets.filter(p => p.owner === 2).length;
+  const autoPlanets = STATE.planets.filter(p => p.owner === 3).length;
+
+  animateNumber('v-players', totalPlayers, v => v.toLocaleString('fr-FR'));
+  document.getElementById('d-players').textContent = 'DÉPLOYÉS ACTUELLEMENT';
+
+  animateNumber('v-campaigns', activePlanets.length);
+  document.getElementById('v-campaigns').textContent = activePlanets.length;
+
+  document.getElementById('v-termin').textContent = terminPlanets;
+  document.getElementById('v-auto').textContent = autoPlanets;
+
+  // Bars
+  const maxP = Math.max(totalPlayers, 1);
+  document.getElementById('b-players').style.width = Math.min(totalPlayers / 50000 * 100, 100) + '%';
+  document.getElementById('b-campaigns').style.width = Math.min(activePlanets.length / 20 * 100, 100) + '%';
+  document.getElementById('b-termin').style.width = Math.min(terminPlanets / 100 * 100, 100) + '%';
+  document.getElementById('b-auto').style.width = Math.min(autoPlanets / 100 * 100, 100) + '%';
+
+  document.getElementById('planet-count').textContent = `PLANÈTES RECENSÉES: ${STATE.planets.length}`;
+}
+
+function animateNumber(id, target, fmt) {
+  const el = document.getElementById(id);
+  const start = parseInt(el.textContent.replace(/\D/g,'')) || 0;
+  const dur = 800; const steps = 30;
+  let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    const val = Math.round(start + (target - start) * step / steps);
+    el.textContent = fmt ? fmt(val) : val;
+    if (step >= steps) { clearInterval(timer); el.textContent = fmt ? fmt(target) : target; }
+  }, dur / steps);
+}
+
+/* ============================================================
+   MAP
+   ============================================================ */
+function renderMap() {
+  const svg = document.getElementById('planets-layer');
+  const lines = document.getElementById('lines-layer');
+  svg.innerHTML = '';
+  lines.innerHTML = '';
+
+  // Position planets in a rough circle/galaxy layout
+  const active = STATE.planets.filter(p => p.inCampaign || p.owner !== 1).slice(0, 60);
+  const w = 800, h = 420, cx = 400, cy = 210;
+
+  active.forEach((planet, i) => {
+    const angle = (i / active.length) * Math.PI * 2;
+    const r = 60 + (planet.sector % 5) * 28 + Math.sin(planet.index * 0.7) * 20;
+    const jitter = Math.sin(planet.index * 1.3) * 15;
+    const x = cx + Math.cos(angle + planet.index * 0.1) * r + jitter;
+    const y = cy + Math.sin(angle + planet.index * 0.1) * r * 0.6 + jitter * 0.5;
+
+    const color = OWNER_COLORS[planet.owner] || '#ffffff';
+    const size = planet.inCampaign ? 7 : 4;
+
+    // Supply line to Super Earth
+    if (planet.inCampaign) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+      line.setAttribute('x2', x); line.setAttribute('y2', y);
+      line.setAttribute('class', 'supply-line');
+      line.setAttribute('stroke', color);
+      lines.appendChild(line);
+    }
+
+    // Planet
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'planet-group');
+    g.setAttribute('cursor', 'pointer');
+    g.style.cursor = 'pointer';
+    g.onclick = () => showPlanetDetail(planet);
+
+    const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    outer.setAttribute('cx', x); outer.setAttribute('cy', y); outer.setAttribute('r', size + 4);
+    outer.setAttribute('fill', `${color}18`); outer.setAttribute('stroke', `${color}40`);
+    outer.setAttribute('stroke-width', '0.5');
+    g.appendChild(outer);
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', size);
+    circle.setAttribute('fill', `${color}60`); circle.setAttribute('stroke', color);
+    circle.setAttribute('stroke-width', planet.inCampaign ? '1.5' : '0.5');
+    circle.setAttribute('class', 'planet-circle');
+    g.appendChild(circle);
+
+    if (planet.inCampaign) {
+      const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      pulse.setAttribute('cx', x); pulse.setAttribute('cy', y); pulse.setAttribute('r', size + 2);
+      pulse.setAttribute('fill', 'none'); pulse.setAttribute('stroke', color);
+      pulse.setAttribute('stroke-width', '0.5');
+      pulse.setAttribute('opacity', '0');
+      pulse.innerHTML = `<animate attributeName="r" values="${size+2};${size+10}" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.5;0" dur="2s" repeatCount="indefinite"/>`;
+      g.appendChild(pulse);
+    }
+
+    svg.appendChild(g);
+  });
+}
+
+/* ============================================================
+   PLANET LIST
+   ============================================================ */
+function renderPlanetList() {
+  const container = document.getElementById('planet-list');
+
+  const active = STATE.planets
+    .filter(p => p.inCampaign)
+    .sort((a, b) => b.players - a.players);
+
+  if (active.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-dim);font-size:10px;">AUCUN FRONT ACTIF DÉTECTÉ</div>';
+    return;
+  }
+
+  container.innerHTML = active.map(p => {
+    const color = OWNER_COLORS[p.owner] || '#fff';
+    const lib = Math.max(0, Math.min(100, p.liberation));
+    const libColor = p.owner === 1 ? '#22c55e' : p.owner === 3 ? '#ef4444' : '#f59e0b';
+    const statusLabel = p.owner === 2 ? 'Infestation' : p.owner === 3 ? 'Occupation' : 'Combat';
+    return `
+    <div class="planet-item" onclick='showPlanetDetail(${JSON.stringify(p)})'>
+      <div class="planet-dot" style="background:${color};box-shadow:0 0 6px ${color};"></div>
+      <div>
+        <div class="planet-name">${p.name}</div>
+        <div class="planet-meta">${statusLabel} ${OWNER_NAMES[p.owner] || '?'} · ${p.players.toLocaleString('fr-FR')} Helldivers</div>
+      </div>
+      <div class="planet-lib-bar">
+        <div class="lib-pct" style="color:${libColor}">${lib.toFixed(1)}%</div>
+        <div class="lib-track">
+          <div class="lib-fill" style="width:${lib}%;background:${libColor};box-shadow:0 0 4px ${libColor};"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderFactionCounts() {
+  document.getElementById('count-human').textContent = STATE.planets.filter(p => p.owner === 1).length;
+  document.getElementById('count-termin').textContent = STATE.planets.filter(p => p.owner === 2).length;
+  document.getElementById('count-auto').textContent = STATE.planets.filter(p => p.owner === 3).length;
+}
+
+/* ============================================================
+   PLANET DETAIL
+   ============================================================ */
+function showPlanetDetail(planet) {
+  const panel = document.getElementById('detail-panel');
+  document.getElementById('dp-name').textContent = planet.name || '---';
+  const ownerName = OWNER_NAMES[planet.owner] || 'Inconnu';
+  const ownerColor = OWNER_COLORS[planet.owner] || '#fff';
+  document.getElementById('dp-faction').textContent = ownerName;
+  document.getElementById('dp-faction').style.color = ownerColor;
+  document.getElementById('dp-sector').textContent = `SECTEUR GALACTIQUE ${planet.sector ?? '?'}`;
+  document.getElementById('dp-players').textContent = (planet.players || 0).toLocaleString('fr-FR') + ' Helldivers';
+  document.getElementById('dp-lib').textContent = (planet.liberation || 0).toFixed(2) + '% de Démocratie';
+  document.getElementById('dp-biome').textContent = (planet.biome || 'inconnu').toUpperCase();
+  document.getElementById('dp-env').textContent = planet.env || planet.environmentals || 'Aucun';
+  renderMiniChart(planet.liberation || 0);
+  panel.classList.add('visible');
+}
+
+function renderMiniChart(currentLib) {
+  // Generate fake history points around current lib
+  const points = [];
+  for (let i = 0; i < 12; i++) {
+    const t = currentLib + (Math.random() - 0.5) * 20 - (i * 0.5);
+    points.push(Math.max(0, Math.min(100, t)));
+  }
+  points.push(currentLib);
+  points.reverse();
+
+  const w = 240, h = 60, pad = 4;
+  const maxV = Math.max(...points, 1);
+  const coords = points.map((v, i) => {
+    const x = pad + (i / (points.length - 1)) * (w - pad * 2);
+    const y = h - pad - (v / 100) * (h - pad * 2);
+    return `${x},${y}`;
+  });
+
+  const line = document.getElementById('mini-chart-line');
+  const area = document.getElementById('mini-chart-area');
+  line.setAttribute('points', coords.join(' '));
+  area.setAttribute('points', `${pad},${h} ${coords.join(' ')} ${w - pad},${h}`);
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+function switchTab(tab) {
+  STATE.activeTab = tab;
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'planets') || (i === 1 && tab === 'sectors'));
+  });
+
+  if (tab === 'sectors') {
+    renderSectors();
+  } else {
+    renderPlanetList();
+  }
+}
+
+function renderSectors() {
+  const container = document.getElementById('planet-list');
+  const bySector = {};
+  STATE.planets.forEach(p => {
+    const s = p.sector ?? 0;
+    if (!bySector[s]) bySector[s] = { players: 0, human: 0, termin: 0, auto: 0, total: 0 };
+    bySector[s].players += p.players;
+    bySector[s].total++;
+    if (p.owner === 1) bySector[s].human++;
+    if (p.owner === 2) bySector[s].termin++;
+    if (p.owner === 3) bySector[s].auto++;
+  });
+
+  const entries = Object.entries(bySector).sort((a, b) => b[1].players - a[1].players).slice(0, 20);
+
+  container.innerHTML = entries.map(([sector, data]) => `
+    <div class="planet-item">
+      <div class="planet-dot" style="background:#f59e0b;box-shadow:0 0 4px #f59e0b;border-radius:2px;"></div>
+      <div>
+        <div class="planet-name">SECTEUR GALACTIQUE ${sector}</div>
+        <div class="planet-meta">${data.total} planètes · ${data.players.toLocaleString('fr-FR')} Helldivers déployés</div>
+      </div>
+      <div style="text-align:right;font-size:9px;color:var(--text-dim);">
+        <div style="color:#06b6d4">${data.human} libérées</div>
+        <div style="color:#f59e0b">${data.termin} infestées</div>
+        <div style="color:#ef4444">${data.auto} occupées</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ============================================================
+   FALLBACK DATA (si API indispo)
+   ============================================================ */
+function renderFallback() {
+  document.getElementById('v-players').textContent = 'N/A';
+  document.getElementById('v-campaigns').textContent = 'N/A';
+  document.getElementById('v-termin').textContent = 'N/A';
+  document.getElementById('v-auto').textContent = 'N/A';
+  document.getElementById('major-order-text').textContent =
+    'Signal interféré — Les transmissions depuis Super Terre sont coupées. La Démocratie attend votre retour, Helldiver. Vérifiez votre connexion.';
+  document.getElementById('planet-list').innerHTML =
+    '<div style="text-align:center;padding:40px;color:var(--red);font-size:10px;letter-spacing:2px;">⚠ SIGNAL PERDU — CONTACT IMPOSSIBLE</div>';
+}
+
+/* ============================================================
+   REFRESH COUNTDOWN
+   ============================================================ */
+function startRefreshCountdown() {
+  STATE.refreshCountdown = 60;
+  const el = document.getElementById('next-refresh');
+  const timer = setInterval(() => {
+    STATE.refreshCountdown--;
+    el.textContent = `${STATE.refreshCountdown}s`;
+    if (STATE.refreshCountdown <= 0) {
+      clearInterval(timer);
+      el.textContent = 'SYNC...';
+      loadData().then(() => startRefreshCountdown());
+    }
+  }, 1000);
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+runLoadingSequence().then(() => {
+  loadData().then(() => startRefreshCountdown());
+});
+</script>
+</body>
+</html>

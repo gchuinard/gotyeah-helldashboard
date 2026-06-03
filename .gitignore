@@ -6,6 +6,7 @@ node_modules/
 # Build
 dist/
 dist-ssr/
+.vite/
 
 # Environment — ne jamais committer .env (contient potentiellement des secrets)
 .env
